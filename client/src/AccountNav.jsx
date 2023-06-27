@@ -1,30 +1,12 @@
-import { useContext, useState } from "react"
-import { UserContext } from "../UserContext"
-import { Link, Navigate, useParams } from "react-router-dom";
-import axios from "axios";
-import PlacesPage from "./PlacesPage";
+import { Link, useLocation } from "react-router-dom";
 
-export default function AccountPage() {
-    const [redirect, setRedirect] = useState(null);
-    const { ready, user, setUser } = useContext(UserContext);
+export default function AccountNav() {
 
-    let { subpage } = useParams()
-    if (subpage === undefined) {
+    const {pathname} = useLocation()
+    let subpage = pathname.split('/')?.[2]
+    if(subpage === undefined){
         subpage = 'profile'
     }
-    async function logout() {
-        await axios.post('/logout');
-        setRedirect('/');
-        setUser(null)
-    }
-
-    if (!ready) {
-        return ('Loading.....')
-    }
-    if (ready && !user && !redirect) {
-        return <Navigate to={'/login'} />
-    }
-
 
     function linkClasses(type = null) {
         let classes = 'inline-flex gap-1 py-2 px-6 rounded-full';
@@ -37,12 +19,9 @@ export default function AccountPage() {
         }
         return classes
     }
-    if (redirect) {
-        return <Navigate to={redirect} />
-    }
+    
     return (
-        <div>
-            <nav className="w-full flex justify-center mt-8 gap-2 mb-8">
+        <nav className="w-full flex justify-center mt-8 gap-2 mb-8">
                 <Link className={linkClasses('profile')} to={'/account'}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                         <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
@@ -67,18 +46,5 @@ export default function AccountPage() {
                     My Accommodations
                 </Link>
             </nav>
-            {subpage === 'profile' && (
-                <div className="text-center max-w-lg mx-auto">
-                    Logged in as {user.name} ({user.email})
-                    <button onClick={logout} className="primary text-white max-w-sm mt-2 ">Logout</button>
-                </div>
-            )}
-
-            {subpage === 'places' && (
-                <div>
-                    <PlacesPage />
-                </div>
-            )}
-        </div>
-    );
+    )
 }
