@@ -6,7 +6,7 @@ import AccountNav from "../AccountNav";
 import { Navigate, useParams } from "react-router-dom";
 
 export default function PlacesFormPage() {
-    const {id} = useParams()
+    const { id } = useParams()
     const [title, setTitle] = useState('');
     const [address, setAddress] = useState('');
     const [addedPhotos, setAddedPhotos] = useState([]);
@@ -16,14 +16,15 @@ export default function PlacesFormPage() {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [maxGuests, setMaxGuests] = useState(1);
+    const [price, setPrice] = useState(100);
     const [redirect, setRedirect] = useState(false);
 
-    useEffect(()=>{
-        if(!id) {
-            return ;
+    useEffect(() => {
+        if (!id) {
+            return;
         }
-        axios.get('/places/'+id).then(response => {
-            const {data} = response
+        axios.get('/places/' + id).then(response => {
+            const { data } = response
             setTitle(data.title)
             setAddress(data.address)
             setAddedPhotos(data.photos)
@@ -33,19 +34,22 @@ export default function PlacesFormPage() {
             setCheckIn(data.checkIn)
             setCheckOut(data.checkOut)
             setMaxGuests(data.maxGuests)
+            setPrice(data.price)
         })
 
     }, [id])
 
     async function savePlace(ev) {
         ev.preventDefault()
-        const placeData = {title, address, addedPhotos,
+        const placeData = {
+            title, address, addedPhotos,
             description, perks, extraInfo,
-            checkIn, checkOut, maxGuests}
-        if(id) {
+            checkIn, checkOut, maxGuests, price
+        }
+        if (id) {
             //update place
             await axios.put('/places', {
-                id,...placeData
+                id, ...placeData
             })
             setRedirect(true)
         }
@@ -56,8 +60,8 @@ export default function PlacesFormPage() {
         }
     }
 
-    if(redirect) {
-        return <Navigate to={'/account/places'}/>
+    if (redirect) {
+        return <Navigate to={'/account/places'} />
     }
 
     return (
@@ -86,7 +90,7 @@ export default function PlacesFormPage() {
                 <p className="text-gray-500 text-sm">House rules, etc</p>
                 <textarea value={extraInfo} onChange={ev => setExtraInfo(ev.target.value)} />
                 <h2 className="text-2xl mt-4 mb-1">Check In & Out Times</h2>
-                <div className="grid gap-2 sm:grid-cols-3">
+                <div className="grid gap-2 grid-cols-2 md:grid-cols-4">
                     <div>
                         <h3 className="mt-2 -mb-1">Check In Time</h3>
                         <input type="text" value={checkIn} onChange={ev => setCheckIn(ev.target.value)}
@@ -100,6 +104,13 @@ export default function PlacesFormPage() {
                     <div>
                         <h3 className="mt-2 -mb-1">Max no. of Guests</h3>
                         <input type="number" value={maxGuests} onChange={ev => setMaxGuests(ev.target.value)}
+                            placeholder=" 5" />
+
+                    </div>
+
+                    <div>
+                        <h3 className="mt-2 -mb-1">Price per Night</h3>
+                        <input type="number" value={price} onChange={ev => setPrice(ev.target.value)}
                             placeholder=" 5" />
 
                     </div>
