@@ -32,7 +32,7 @@ export default function PlaceGallery({ place }) {
     return (
         <div className="relative">
             <div className="grid gap-3 grid-cols-[2fr_1fr] rounded-3xl overflow-hidden">
-                <div>
+                <div >
                     {place.photos?.[0] && (
                         <img onClick={() => setShowAllPhotos(true)} className="cursor-pointer aspect-square object-cover" src={'http://localhost:4000/uploads/' + place.photos[0]} alt="" />
                     )}

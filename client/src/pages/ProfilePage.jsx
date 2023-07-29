@@ -1,6 +1,6 @@
 import { useContext, useState } from "react"
 import { UserContext } from "../UserContext"
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import axios from "axios";
 import PlacesPage from "./PlacesPage";
 import AccountNav from "../AccountNav";
@@ -27,7 +27,7 @@ export default function ProfilePage() {
     }
 
 
-   
+
     if (redirect) {
         return <Navigate to={redirect} />
     }
@@ -35,9 +35,14 @@ export default function ProfilePage() {
         <div>
             <AccountNav />
             {subpage === 'profile' && (
-                <div className="text-center max-w-lg mx-auto">
-                    Logged in as {user.name} ({user.email})
-                    <button onClick={logout} className="primary text-white max-w-sm mt-2 ">Logout</button>
+                <div className="inline-flex items-center flex-col gap-1 bg-gray-100 p-3 mx-3 rounded-xl">
+                    <div className="">
+                        <span className="text-xl font-medium ">My Details : </span> <br />
+                        <span className="text-lg font-normal"> Name : <span className="font-medium text-xl">{user.name}</span></span> <br />
+                        <span className="text-lg font-normal"> Email : <span className="font-medium text-xl">{user.email}</span></span> <br />
+
+                    </div>
+                    <button onClick={logout} className=" bg-primary mt-3 p-2 w-3/6 rounded-2xl text-lg text-white">Logout</button>
                 </div>
             )}
 
