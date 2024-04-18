@@ -22,8 +22,8 @@ const jwtSecret = 'dsuhfuersgtfueskrhirfetgfh';
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  "credentials" : true,
-  "origin" : "http://localhost:5173"
+  "credentials": true,
+  "origin": "http://localhost:5173"
 }));
 app.use('/uploads', express.static(__dirname + '/uploads'))
 
@@ -31,8 +31,8 @@ mongoose.connect(process.env.MONGO_URL);
 
 function getUserDatafromReq(req) {
   return new Promise((resolve, reject) => {
-    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData)=>{
-      if(err) throw err;
+    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
       resolve(userData)
     })
   })
@@ -44,12 +44,12 @@ app.get('/test', (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  const {name, email, password} = req.body;
+  const { name, email, password } = req.body;
   try {
     const userDoc = await User.create({
       name,
       email,
-      password:bcrypt.hashSync(password, bcryptSalt)
+      password: bcrypt.hashSync(password, bcryptSalt)
     });
     res.json(userDoc)
   } catch (error) {
@@ -57,20 +57,20 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.post('/login', async (req,res) => {
-  const {email, password} = req.body;
-  const userDoc = await User.findOne({email});
-  if(userDoc) {
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const userDoc = await User.findOne({ email });
+  if (userDoc) {
     const passok = bcrypt.compareSync(password, userDoc.password)
-    if(passok) {
-      jwt.sign({email:userDoc.email, id: userDoc._id}, jwtSecret, {}, (err, token) => {
-        if(err) throw  err;
+    if (passok) {
+      jwt.sign({ email: userDoc.email, id: userDoc._id }, jwtSecret, {}, (err, token) => {
+        if (err) throw err;
         res.cookie('token', token).json(userDoc)
 
       });
     }
     else {
-      res.json('incorrect Password' )
+      res.json('incorrect Password')
     }
   }
   else {
@@ -80,10 +80,10 @@ app.post('/login', async (req,res) => {
 });
 
 app.get('/profile', (req, res) => {
-  const {token} = req.cookies;
-  if(token) {
-    jwt.verify(token, jwtSecret, {}, async (err, userData)=>{
-      if(err) throw err;
+  const { token } = req.cookies;
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
       const userDoc = await User.findById(userData.id);
       res.json(userDoc)
     })
@@ -93,12 +93,12 @@ app.get('/profile', (req, res) => {
   }
 })
 
-app.post('/logout', (req,res) => {
+app.post('/logout', (req, res) => {
   res.cookie('token', '').json(true)
 })
 
 app.post('/upload-by-link', async (req, res) => {
-  const {link} = req.body
+  const { link } = req.body
   const newName = 'photo' + Date.now() + '.jpg'
   await imageDownloader.image({
     url: link,
@@ -107,12 +107,12 @@ app.post('/upload-by-link', async (req, res) => {
   res.json(newName)
 })
 
-const photosMiddleware = multer({dest:'uploads'})
-app.post('/upload',photosMiddleware.array('photos', 100) , (req, res) => {
-  
+const photosMiddleware = multer({ dest: 'uploads' })
+app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
+
   const uploadedFiles = []
-  for(let i = 0; i < req.files.length; i++) {
-    const {path, originalname} = req.files[i];
+  for (let i = 0; i < req.files.length; i++) {
+    const { path, originalname } = req.files[i];
     const parts = originalname.split('.')
     const ext = parts[parts.length - 1]
     const newPath = path + '.' + ext
@@ -125,18 +125,18 @@ app.post('/upload',photosMiddleware.array('photos', 100) , (req, res) => {
 })
 
 
-app.post('/places', (req,res) => {
-  const {token} = req.cookies;
-  const {title, address,addedPhotos,
-    description,perks,extraInfo, 
+app.post('/places', (req, res) => {
+  const { token } = req.cookies;
+  const { title, address, addedPhotos,
+    description, perks, extraInfo,
     checkIn, checkOut, maxGuests, price } = req.body
-  jwt.verify(token, jwtSecret, {}, async (err, userData)=>{
-    if(err) throw err;
-    
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) throw err;
+
     const placeDoc = await Place.create({
-      owner : userData.id,
-      title, address, photos:addedPhotos,
-      description,perks,extraInfo, 
+      owner: userData.id,
+      title, address, photos: addedPhotos,
+      description, perks, extraInfo,
       checkIn, checkOut, maxGuests, price
     })
     res.json(placeDoc)
@@ -146,36 +146,36 @@ app.post('/places', (req,res) => {
 
 
 app.get('/user-places', (req, res) => {
-  const {token} = req.cookies;
-  jwt.verify(token, jwtSecret, {}, async (err, userData)=>{
-    const {id} = userData;
+  const { token } = req.cookies;
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    const { id } = userData;
 
-    res.json(await Place.find({owner:id}));
+    res.json(await Place.find({ owner: id }));
   })
 })
 
 
 app.get('/places/:id', async (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
   res.json(await Place.findById(id))
 })
 
-app.put('/places', async(req, res) => {
-  const {token} = req.cookies;
-  const {id, title, address,addedPhotos,
-    description,perks,extraInfo, 
+app.put('/places', async (req, res) => {
+  const { token } = req.cookies;
+  const { id, title, address, addedPhotos,
+    description, perks, extraInfo,
     checkIn, checkOut, maxGuests, price } = req.body
 
-    jwt.verify(token, jwtSecret, {}, async (err, userData)=>{
-    if(err) throw err;
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) throw err;
     const placeDoc = await Place.findById(id);
     // console.log(userData.id === placeDoc.owner.toString())
-    if(userData.id === placeDoc.owner.toString()) {
+    if (userData.id === placeDoc.owner.toString()) {
       placeDoc.set({
-      
-      title, address, photos:addedPhotos,
-      description,perks,extraInfo, 
-      checkIn, checkOut, maxGuests, price
+
+        title, address, photos: addedPhotos,
+        description, perks, extraInfo,
+        checkIn, checkOut, maxGuests, price
       });
 
       await placeDoc.save();
@@ -194,13 +194,13 @@ app.get('/places', async (req, res) => {
 
 app.post('/bookings', async (req, res) => {
   const userData = await getUserDatafromReq(req);
-  const {place, checkIn, checkOut,
-     numberOfGuests, name, phone, price} = req.body;
+  const { place, checkIn, checkOut,
+    numberOfGuests, name, phone, price } = req.body;
 
   Booking.create({
     place, checkIn, checkOut,
-    numberOfGuests, name, phone, price, user:userData.id
-  }).then(( doc)=> {
+    numberOfGuests, name, phone, price, user: userData.id
+  }).then((doc) => {
     res.json(doc)
   }).catch((err) => {
     throw err;
@@ -208,12 +208,9 @@ app.post('/bookings', async (req, res) => {
 })
 
 
-
-
-
 app.get('/bookings', async (req, res) => {
   const userData = await getUserDatafromReq(req);
-  res.json(await Booking.find({user:userData.id}).populate('place'))
+  res.json(await Booking.find({ user: userData.id }).populate('place'))
 })
 
 app.listen(4000);
